@@ -1,28 +1,20 @@
 package de.sldk.mc.collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.function.Supplier;
-
-@ExtendWith(MockitoExtension.class)
 class TpsCollectorTest {
 
-	@Mock
-	private Supplier<Long> mockSystemTime;
+	private long systemTime;
 	private TpsCollector tpsCollector;
 
 	@BeforeEach
 	void setup() {
-		mockSystemTime(0L);
-		tpsCollector = new TpsCollector(mockSystemTime);
+		systemTime = 0L;
+		tpsCollector = new TpsCollector(() -> systemTime);
 	}
 
 	@Test
@@ -71,13 +63,8 @@ class TpsCollectorTest {
 		assertThat(tpsCollector.getAverageTPS()).isEqualTo(20);
 	}
 
-	private void mockSystemTime(long millis) {
-		when(mockSystemTime.get()).thenReturn(millis);
-	}
-
 	private void advanceSystemTime(long millis) {
-		long newTime = mockSystemTime.get() + millis;
-		when(mockSystemTime.get()).thenReturn(newTime);
+		systemTime += millis;
 	}
 
 }

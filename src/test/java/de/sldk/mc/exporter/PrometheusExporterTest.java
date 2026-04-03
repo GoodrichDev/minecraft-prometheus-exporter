@@ -2,7 +2,6 @@ package de.sldk.mc.exporter;
 
 
 import de.sldk.mc.MetricsServer;
-import de.sldk.mc.PrometheusExporter;
 import de.sldk.mc.health.ConcurrentHealthChecks;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
@@ -13,20 +12,19 @@ import org.eclipse.jetty.util.URIUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.bukkit.plugin.Plugin;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class PrometheusExporterTest {
 
-	@Mock
-	private PrometheusExporter exporterMock;
+	private Plugin plugin;
 
 	private int metricsServerPort;
 	private MetricsServer metricsServer;
@@ -35,8 +33,10 @@ public class PrometheusExporterTest {
 	void setup() throws Exception {
 		CollectorRegistry.defaultRegistry.clear();
 		metricsServerPort = getRandomFreePort();
+		plugin = mock(Plugin.class);
+		when(plugin.getLogger()).thenReturn(Logger.getAnonymousLogger());
 		metricsServer = new MetricsServer(
-                "localhost", metricsServerPort, exporterMock, ConcurrentHealthChecks.create()
+                "localhost", metricsServerPort, plugin, ConcurrentHealthChecks.create()
         );
 		metricsServer.start();
 	}

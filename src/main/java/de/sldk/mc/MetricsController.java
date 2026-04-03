@@ -9,6 +9,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
+import org.bukkit.plugin.Plugin;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -18,14 +19,14 @@ import java.util.logging.Level;
 public class MetricsController extends Handler.Abstract {
 
     private final MetricRegistry metricRegistry = MetricRegistry.getInstance();
-    private final PrometheusExporter exporter;
+    private final Plugin plugin;
 
-    private MetricsController(PrometheusExporter exporter) {
-        this.exporter = exporter;
+    private MetricsController(Plugin plugin) {
+        this.plugin = plugin;
     }
 
-    public static Handler create(final PrometheusExporter exporter) {
-        return new MetricsController(exporter);
+    public static Handler create(final Plugin plugin) {
+        return new MetricsController(plugin);
     }
 
     @Override
@@ -40,8 +41,8 @@ public class MetricsController extends Handler.Abstract {
 
             writeMetricsToResponse(request, response);
         } catch (Exception e) {
-            exporter.getLogger().log(Level.WARNING, "Failed to read server statistic: " + e.getMessage());
-            exporter.getLogger().log(Level.FINE, "Failed to read server statistic: ", e);
+            plugin.getLogger().log(Level.WARNING, "Failed to read server statistic: " + e.getMessage());
+            plugin.getLogger().log(Level.FINE, "Failed to read server statistic: ", e);
             Response.writeError(request, response, callback, HttpStatus.INTERNAL_SERVER_ERROR_500, "Failed to read server statistics");
         }
         callback.succeeded();
