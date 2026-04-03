@@ -148,8 +148,8 @@ The following metrics are exported by the plugin:
 | mc_whitelisted_players   | Players count on the white list                    | ✅             |
 | mc_loaded_chunks_total   | Chunks loaded per world                            | ✅             |
 | mc_players_online_total  | Online players per world                           | ✅             |
-| mc_entities_total        | Entities loaded per world (living + non-living)    | ❌             |
-| mc_villagers_total       | Villagers                                          | ❌             |
+| mc_entities_total        | Entities loaded per world (living + non-living)    | ✅             |
+| mc_villagers_total       | Villagers                                          | ✅             |
 | mc_world_size            | World size in bytes                                | ✅             |
 | mc_jvm_memory            | JVM memory usage                                   | ✅             |
 | mc_jvm_threads           | JVM threads info                                   | ✅             |
@@ -204,7 +204,7 @@ This doesn't support all statistics in the list because they are provided by the
 
 - Java 17 is required for the latest version of the plugin.
 - There is a known [issue](https://github.com/sladkoff/minecraft-prometheus-exporter/issues/197) with Azul JVM.
-- Folia support is still partial. Metrics that require cross-region entity scans are still limited.
+- Folia support is still partial. `mc_player_statistic` remains unsupported on Folia.
 - The plugin has been tested recently on
   - Minecraft 1.20.4
   - Minecraft 1.21.11

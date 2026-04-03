@@ -1,5 +1,7 @@
 package de.sldk.mc.metrics;
 
+import de.sldk.mc.collectors.FoliaEntityCollector;
+import de.sldk.mc.folia.FoliaSupport;
 import io.prometheus.client.Gauge;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -34,9 +36,28 @@ public class Entities extends WorldMetric {
      * Override the value returned by {@link EntityType#isAlive()}.
      */
     private static final Map<EntityType, Boolean> ALIVE_OVERRIDE = singletonMap(EntityType.ARMOR_STAND, false);
+    private final boolean folia = FoliaSupport.isFolia();
+    private FoliaEntityCollector foliaEntityCollector;
 
     public Entities(Plugin plugin) {
         super(plugin, ENTITIES);
+    }
+
+    @Override
+    public void enable() {
+        super.enable();
+        if (folia) {
+            foliaEntityCollector = FoliaEntityCollector.acquire(getPlugin());
+        }
+    }
+
+    @Override
+    public void disable() {
+        super.disable();
+        if (folia) {
+            FoliaEntityCollector.release(getPlugin());
+            foliaEntityCollector = null;
+        }
     }
 
     @Override
@@ -46,6 +67,18 @@ public class Entities extends WorldMetric {
 
     @Override
     public void collect(World world) {
+        if (folia) {
+            foliaEntityCollector.getEntityCounts(world.getName())
+                    .forEach((entityType, count) ->
+                            ENTITIES
+                                    .labels(world.getName(),
+                                            getEntityName(entityType),
+                                            Boolean.toString(isEntityTypeAlive(entityType)),
+                                            Boolean.toString(entityType.isSpawnable()))
+                                    .set(count));
+            return;
+        }
+
         Map<EntityType, Long> mapEntityTypesToCounts = world.getEntities().stream()
                 .collect(Collectors.groupingBy(Entity::getType, Collectors.counting()));
 
@@ -62,5 +95,10 @@ public class Entities extends WorldMetric {
 
     private boolean isEntityTypeAlive(EntityType type) {
         return ALIVE_OVERRIDE.containsKey(type) ? ALIVE_OVERRIDE.get(type) : type.isAlive();
+    }
+
+    @Override
+    public boolean isFoliaCapable() {
+        return true;
     }
 }

@@ -1,5 +1,7 @@
 package de.sldk.mc.metrics;
 
+import de.sldk.mc.collectors.FoliaEntityCollector;
+import de.sldk.mc.folia.FoliaSupport;
 import io.prometheus.client.Gauge;
 import org.bukkit.World;
 import org.bukkit.entity.Villager;
@@ -27,9 +29,28 @@ public class Villagers extends WorldMetric {
             .help("Villagers total count, labelled by world, type, profession, and level")
             .labelNames("world", "type", "profession", "level")
             .create();
+    private final boolean folia = FoliaSupport.isFolia();
+    private FoliaEntityCollector foliaEntityCollector;
 
     public Villagers(Plugin plugin) {
         super(plugin, VILLAGERS);
+    }
+
+    @Override
+    public void enable() {
+        super.enable();
+        if (folia) {
+            foliaEntityCollector = FoliaEntityCollector.acquire(getPlugin());
+        }
+    }
+
+    @Override
+    public void disable() {
+        super.disable();
+        if (folia) {
+            FoliaEntityCollector.release(getPlugin());
+            foliaEntityCollector = null;
+        }
     }
 
     @Override
@@ -39,6 +60,17 @@ public class Villagers extends WorldMetric {
 
     @Override
     public void collect(World world) {
+        if (folia) {
+            foliaEntityCollector.getVillagerCounts(world.getName()).forEach((grouping, count) ->
+                    VILLAGERS
+                            .labels(world.getName(),
+                                    grouping.type().getKey().getKey(),
+                                    grouping.profession().getKey().getKey(),
+                                    Integer.toString(grouping.level()))
+                            .set(count));
+            return;
+        }
+
         Map<VillagerGrouping, Long> mapVillagerGroupingToCount = world
                 .getEntitiesByClass(Villager.class).stream()
                 .collect(Collectors.groupingBy(VillagerGrouping::new, Collectors.counting()));
@@ -81,5 +113,10 @@ public class Villagers extends WorldMetric {
         public int hashCode() {
             return Objects.hash(type, profession, level);
         }
+    }
+
+    @Override
+    public boolean isFoliaCapable() {
+        return true;
     }
 }

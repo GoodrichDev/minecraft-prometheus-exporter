@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Expand Folia support for Minecraft 1.21.11 with TPS, tick duration, loaded chunk, whitelist, and per-player online metrics
+- Add Folia-safe entity and villager metrics backed by region event tracking
 
 ### Fixed
 - Avoid division-by-zero when no tick duration samples are available yet
