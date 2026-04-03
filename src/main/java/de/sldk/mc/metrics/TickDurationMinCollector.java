@@ -17,19 +17,16 @@ public class TickDurationMinCollector extends Metric {
         super(plugin, TD);
     }
 
-    private long getTickDurationMin() {
-        long min = Long.MAX_VALUE;
-        for (Long val : collector.getTickDurations()) {
-            if (val < min) {
-                min = val;
-            }
+    @Override
+    public void doCollect() {
+        if (!collector.isAvailable()) {
+            return;
         }
-        return min;
+        TD.set(collector.getMinTickDurationNanos());
     }
 
     @Override
-    public void doCollect() {
-        TD.set(getTickDurationMin());
+    public boolean isFoliaCapable() {
+        return collector.isFoliaCapable();
     }
 }
-

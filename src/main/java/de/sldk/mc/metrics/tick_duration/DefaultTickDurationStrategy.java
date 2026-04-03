@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DefaultTickDurationStrategy implements TickDurationStrategy {
+public class DefaultTickDurationStrategy extends ArrayBackedTickDurationStrategy {
     /*
      * If reflection is successful, this will hold a reference directly to the
      * MinecraftServer internal tick duration tracker
@@ -66,7 +66,8 @@ public class DefaultTickDurationStrategy implements TickDurationStrategy {
      * or a long array containing just one element of value -1 if reflection
      * was unable to locate the minecraft tick times buffer
      */
-    public long[] getTickDurations() {
+    @Override
+    protected long[] getTickDurations() {
         // Return a copy of the array to prevent modification
         return tickDurationReference.clone();
     }

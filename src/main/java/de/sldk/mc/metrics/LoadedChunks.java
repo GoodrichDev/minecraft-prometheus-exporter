@@ -1,6 +1,7 @@
 package de.sldk.mc.metrics;
 
 import de.sldk.mc.collectors.LoadedChunksCollector;
+import de.sldk.mc.folia.FoliaSupport;
 import io.prometheus.client.Gauge;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
@@ -14,6 +15,7 @@ public class LoadedChunks extends WorldMetric {
             .labelNames("world")
             .create();
 
+    private final boolean folia = FoliaSupport.isFolia();
     private final LoadedChunksCollector loadedChunksCollector = new LoadedChunksCollector();
 
     public LoadedChunks(Plugin plugin) {
@@ -23,13 +25,17 @@ public class LoadedChunks extends WorldMetric {
     @Override
     public void enable() {
         super.enable();
-        getPlugin().getServer().getPluginManager().registerEvents(loadedChunksCollector, getPlugin());
+        if (!folia) {
+            getPlugin().getServer().getPluginManager().registerEvents(loadedChunksCollector, getPlugin());
+        }
     }
 
     @Override
     public void disable() {
         super.disable();
-        HandlerList.unregisterAll(loadedChunksCollector);
+        if (!folia) {
+            HandlerList.unregisterAll(loadedChunksCollector);
+        }
     }
 
     @Override
@@ -39,6 +45,15 @@ public class LoadedChunks extends WorldMetric {
 
     @Override
     public void collect(World world) {
+        if (folia) {
+            LOADED_CHUNKS.labels(world.getName()).set(world.getChunkCount());
+            return;
+        }
         LOADED_CHUNKS.labels(world.getName()).set(loadedChunksCollector.getLoadedChunkTotal(world.getName()));
+    }
+
+    @Override
+    public boolean isFoliaCapable() {
+        return true;
     }
 }

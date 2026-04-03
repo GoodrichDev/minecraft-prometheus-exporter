@@ -20,4 +20,8 @@ public class WhitelistedPlayers extends Metric {
         PLAYERS.set(Bukkit.getWhitelistedPlayers().size());
     }
 
+    @Override
+    public boolean isFoliaCapable() {
+        return true;
+    }
 }

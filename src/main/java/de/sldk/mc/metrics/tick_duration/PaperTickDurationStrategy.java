@@ -5,7 +5,7 @@ import org.bukkit.Server;
 
 import java.lang.reflect.Method;
 
-public class PaperTickDurationStrategy implements TickDurationStrategy {
+public class PaperTickDurationStrategy extends ArrayBackedTickDurationStrategy {
 
     public PaperTickDurationStrategy() {
     }
@@ -35,7 +35,8 @@ public class PaperTickDurationStrategy implements TickDurationStrategy {
         }
     }
 
-    public long[] getTickDurations() {
+    @Override
+    protected long[] getTickDurations() {
         return getPaperTickTimes();
     }
 }

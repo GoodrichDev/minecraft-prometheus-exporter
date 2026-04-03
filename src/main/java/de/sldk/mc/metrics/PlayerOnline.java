@@ -20,4 +20,9 @@ public class PlayerOnline extends PlayerMetric {
     public void collect(OfflinePlayer player) {
         PLAYERS_WITH_NAMES.labels(getNameOrUid(player), getUid(player)).set(player.isOnline() ? 1 : 0);
     }
+
+    @Override
+    public boolean isFoliaCapable() {
+        return true;
+    }
 }

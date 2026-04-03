@@ -17,19 +17,16 @@ public class TickDurationMaxCollector extends Metric {
         super(plugin, TD);
     }
 
-    private long getTickDurationMax() {
-        long max = Long.MIN_VALUE;
-        for (Long val : collector.getTickDurations()) {
-            if (val > max) {
-                max = val;
-            }
+    @Override
+    public void doCollect() {
+        if (!collector.isAvailable()) {
+            return;
         }
-        return max;
+        TD.set(collector.getMaxTickDurationNanos());
     }
 
     @Override
-    public void doCollect() {
-        TD.set(getTickDurationMax());
+    public boolean isFoliaCapable() {
+        return collector.isFoliaCapable();
     }
 }
-

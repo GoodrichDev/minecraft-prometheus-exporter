@@ -51,7 +51,7 @@ public class PathFileSizeTest {
 
         @RepeatedTest(5)
         public void returnsFileSize() throws IOException {
-            int length = new Random().nextInt(10000);
+            int length = new Random().nextInt(1, 10001);
             try (FileWriter fileWriter = new FileWriter(path.toFile())) {
                 fileWriter.write(new RandomString(length).nextString());
             }
@@ -106,7 +106,7 @@ public class PathFileSizeTest {
     private static long createMultipleFilesInTmpDirectory(Path path, int files) throws IOException {
         int totalLength = 0;
         for (int i = 0; i < files; i++) {
-            int length = new Random().nextInt(10000);
+            int length = new Random().nextInt(1, 10001);
             createFileInTmpDirectory(path, "test" + i + "txt", length);
             totalLength += length;
         }

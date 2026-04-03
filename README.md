@@ -145,19 +145,19 @@ The following metrics are exported by the plugin:
 | Label                    | Description                                        | Folia Support |
 |--------------------------|----------------------------------------------------|---------------|
 | mc_players_total         | Unique players on server (online + offline)        | ✅             |
-| mc_whitelisted_players   | Players count on the white list                    | ❌             |
-| mc_loaded_chunks_total   | Chunks loaded per world                            | ❌             |
+| mc_whitelisted_players   | Players count on the white list                    | ✅             |
+| mc_loaded_chunks_total   | Chunks loaded per world                            | ✅             |
 | mc_players_online_total  | Online players per world                           | ✅             |
 | mc_entities_total        | Entities loaded per world (living + non-living)    | ❌             |
 | mc_villagers_total       | Villagers                                          | ❌             |
 | mc_world_size            | World size in bytes                                | ✅             |
 | mc_jvm_memory            | JVM memory usage                                   | ✅             |
 | mc_jvm_threads           | JVM threads info                                   | ✅             |
-| mc_tps                   | Server tickrate (TPS)                              | ❌             |
-| mc_tick_duration_median  | Median Tick Duration (ns, usually last 100 ticks)  | ❌             |
-| mc_tick_duration_average | Average Tick Duration (ns, usually last 100 ticks) | ❌             |
-| mc_tick_duration_min     | Min Tick Duration (ns, usually last 100 ticks)     | ❌             |
-| mc_tick_duration_max     | Max Tick Duration (ns, usually last 100 ticks)     | ❌             |
+| mc_tps                   | Server tickrate (TPS)                              | ✅             |
+| mc_tick_duration_median  | Median Tick Duration (ns, usually last 100 ticks)  | ✅             |
+| mc_tick_duration_average | Average Tick Duration (ns, usually last 100 ticks) | ✅             |
+| mc_tick_duration_min     | Min Tick Duration (ns, usually last 100 ticks)     | ✅             |
+| mc_tick_duration_max     | Max Tick Duration (ns, usually last 100 ticks)     | ✅             |
 
 ### Player metrics
 
@@ -184,7 +184,7 @@ This will enable the additional metrics.
 | Label               | Description                 | Folia |
 |---------------------|-----------------------------|-------|
 | mc_player_statistic | Player statistics           | ❌     |
-| mc_player_online    | Online state by player name | ❌     |
+| mc_player_online    | Online state by player name | ✅     |
 
 There's an additional sample [Grafana dashboard](https://raw.githubusercontent.com/sladkoff/minecraft-prometheus-exporter/master/dashboards/minecraft-players-dashboard.json)
 with player statistics enabled to get you started.
@@ -204,10 +204,10 @@ This doesn't support all statistics in the list because they are provided by the
 
 - Java 17 is required for the latest version of the plugin.
 - There is a known [issue](https://github.com/sladkoff/minecraft-prometheus-exporter/issues/197) with Azul JVM.
-- There is currently rudimentary support for Folia servers. Only selected metrics are supported.
+- Folia support is still partial. Metrics that require cross-region entity scans are still limited.
 - The plugin has been tested recently on
-  - Minecraft 1.20.1 
   - Minecraft 1.20.4
+  - Minecraft 1.21.11
 
 ## Plugin Integration
 
