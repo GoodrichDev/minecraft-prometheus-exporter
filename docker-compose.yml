@@ -5,7 +5,7 @@ services:
     image: itzg/minecraft-server:2025.2.1
     environment:
       EULA: "true"
-      VERSION: "1.20.4"
+      VERSION: "1.21.11"
       TYPE: "FOLIA"
 #      TYPE: "PAPER"
 #      PLUGINS: |

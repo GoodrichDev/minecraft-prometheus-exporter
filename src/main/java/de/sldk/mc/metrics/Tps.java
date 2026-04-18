@@ -1,8 +1,9 @@
 package de.sldk.mc.metrics;
 
 import de.sldk.mc.collectors.TpsCollector;
+import de.sldk.mc.folia.FoliaSupport;
+import de.sldk.mc.folia.FoliaTickStatistics;
 import io.prometheus.client.Gauge;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 public class Tps extends Metric {
@@ -12,34 +13,50 @@ public class Tps extends Metric {
             .help("Server TPS (ticks per second)")
             .create();
 
-    private int taskId;
+    private final boolean folia = FoliaSupport.isFolia();
+    private final FoliaTickStatistics foliaTickStatistics;
 
-    private TpsCollector tpsCollector = new TpsCollector();
+    private final TpsCollector tpsCollector = new TpsCollector();
+    private int taskId = -1;
 
     public Tps(Plugin plugin) {
         super(plugin, TPS);
+        this.foliaTickStatistics = folia ? FoliaTickStatistics.forServer(plugin.getServer(), plugin.getLogger()) : null;
     }
 
     @Override
     public void enable() {
         super.enable();
-        this.taskId = startTask(getPlugin());
+        if (!folia) {
+            this.taskId = startTask(getPlugin());
+        }
     }
 
     @Override
     public void disable() {
         super.disable();
-        Bukkit.getScheduler().cancelTask(taskId);
+        if (!folia && taskId != -1) {
+            getPlugin().getServer().getScheduler().cancelTask(taskId);
+        }
     }
 
     private int startTask(Plugin plugin) {
-        return Bukkit.getServer()
+        return plugin.getServer()
                 .getScheduler()
                 .scheduleSyncRepeatingTask(plugin, tpsCollector, 0, TpsCollector.POLL_INTERVAL);
     }
 
     @Override
     public void doCollect() {
+        if (folia) {
+            TPS.set(foliaTickStatistics.getAverageTps());
+            return;
+        }
         TPS.set(tpsCollector.getAverageTPS());
+    }
+
+    @Override
+    public boolean isFoliaCapable() {
+        return !folia || foliaTickStatistics.isAvailable();
     }
 }

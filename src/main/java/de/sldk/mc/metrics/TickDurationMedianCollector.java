@@ -4,8 +4,6 @@ import de.sldk.mc.metrics.tick_duration.TickDurationCollector;
 import io.prometheus.client.Gauge;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Arrays;
-
 public class TickDurationMedianCollector extends Metric {
     private static final String NAME = "tick_duration_median";
     private final TickDurationCollector collector = TickDurationCollector.forServerImplementation(this.getPlugin());
@@ -19,14 +17,16 @@ public class TickDurationMedianCollector extends Metric {
         super(plugin, TD);
     }
 
-    private long getTickDurationMedian() {
-        long[] tickTimes = collector.getTickDurations();
-        Arrays.sort(tickTimes);
-        return tickTimes[tickTimes.length / 2];
+    @Override
+    public void doCollect() {
+        if (!collector.isAvailable()) {
+            return;
+        }
+        TD.set(collector.getMedianTickDurationNanos());
     }
 
     @Override
-    public void doCollect() {
-        TD.set(getTickDurationMedian());
+    public boolean isFoliaCapable() {
+        return collector.isFoliaCapable();
     }
 }

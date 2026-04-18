@@ -17,17 +17,16 @@ public class TickDurationAverageCollector extends Metric {
         super(plugin, TD);
     }
 
-    private long getTickDurationAverage() {
-        long sum = 0;
-        long[] durations = collector.getTickDurations();
-        for (Long val : durations) {
-            sum += val;
+    @Override
+    public void doCollect() {
+        if (!collector.isAvailable()) {
+            return;
         }
-        return sum / durations.length;
+        TD.set(collector.getAverageTickDurationNanos());
     }
 
     @Override
-    public void doCollect() {
-        TD.set(getTickDurationAverage());
+    public boolean isFoliaCapable() {
+        return collector.isFoliaCapable();
     }
 }

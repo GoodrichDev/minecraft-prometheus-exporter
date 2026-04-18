@@ -1,10 +1,10 @@
 package de.sldk.mc.metrics;
 
+import de.sldk.mc.folia.FoliaSupport;
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +33,7 @@ public abstract class Metric {
         }
 
         if (isAsyncCapable()) {
-            return CompletableFuture.runAsync(() -> {
+            return FoliaSupport.runAsync(plugin, () -> {
                 try {
                     doCollect();
                 } catch (Exception e) {
@@ -41,20 +41,13 @@ public abstract class Metric {
                 }
             });
         } else {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-
-            // don't call .get() - this blocks the ForkJoinPool.commonPool and may deadlock the server in some cases
-            Bukkit.getScheduler().callSyncMethod(plugin, () -> {
+            return FoliaSupport.runSync(plugin, () -> {
                 try {
                     doCollect();
                 } catch (Exception e) {
                     logException(e);
                 }
-                future.complete(null);
-                return null;
             });
-
-            return future;
         }
     }
 

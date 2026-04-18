@@ -7,6 +7,7 @@ import io.prometheus.client.CollectorRegistry;
 import java.io.*;
 import java.nio.file.*;
 import java.util.Random;
+import java.util.logging.Logger;
 import net.bytebuddy.utility.RandomString;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
@@ -27,7 +28,9 @@ public class WorldSizeTest {
 
     @BeforeEach
     public void beforeEach() {
-        worldSizeMetric = new WorldSize(mock(Plugin.class));
+        Plugin plugin = mock(Plugin.class);
+        when(plugin.getLogger()).thenReturn(Logger.getAnonymousLogger());
+        worldSizeMetric = new WorldSize(plugin);
         worldSizeMetric.enable();
     }
 
@@ -81,10 +84,9 @@ public class WorldSizeTest {
 
     private void givenWorldFileDoesNotExist() {
         String worldName = "some_file_that_surely_does_not_exist_"  + new RandomString(10).nextString();
-        file = mock(File.class);
+        file = path.resolve(worldName).toFile();
         world = mock(World.class);
 
-        when(file.toPath()).thenReturn(path);
         when(world.getWorldFolder()).thenReturn(file);
         when(world.getName()).thenReturn(worldName);
     }
